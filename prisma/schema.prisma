@@ -1,0 +1,274 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  MANAGER
+  TEAM
+  MITGLIED
+}
+
+model User {
+  id            String            @id @default(cuid())
+  name          String
+  email         String            @unique
+  passwordHash  String
+  role          Role              @default(MITGLIED)
+  createdAt     DateTime          @default(now())
+  posts         Post[]
+  groupMemberships GroupMembership[]
+  eventRsvps    EventRsvp[]
+  ownedGroups   Group[]           @relation("GroupOwner")
+  joinRequests  GroupJoinRequest[]
+  groupPosts    GroupPost[]
+  groupPostReplies GroupPostReply[]
+  eventComments EventComment[]
+  pollVotes     GroupPollVote[]
+}
+
+model Post {
+  id         String   @id @default(cuid())
+  title      String
+  slug       String   @unique
+  excerpt    String?
+  content    String
+  coverImage String?
+  published  Boolean  @default(false)
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Event {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String      @unique
+  description String
+  location    String?
+  startDate   DateTime
+  endDate     DateTime?
+  coverImage  String?
+  promoVideo  String?
+  capacity    Int?
+  published   Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  rsvps       EventRsvp[]
+  groupId     String?
+  group       Group?      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  comments    EventComment[]
+}
+
+model EventComment {
+  id        String   @id @default(cuid())
+  eventId   String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+enum RsvpStatus {
+  ZUSAGE
+  ABSAGE
+}
+
+model EventRsvp {
+  id           String     @id @default(cuid())
+  eventId      String
+  userId       String
+  status       RsvpStatus
+  checkInCode  String     @unique @default(cuid())
+  checkedInAt  DateTime?
+  respondedAt  DateTime   @updatedAt
+  event        Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+}
+
+model GalleryImage {
+  id          String   @id @default(cuid())
+  url         String
+  title       String?
+  description String?
+  category    String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+enum InquiryStatus {
+  NEU
+  BEARBEITUNG
+  ERLEDIGT
+}
+
+model InquiryRequest {
+  id                String        @id @default(cuid())
+  firstName         String
+  lastName          String
+  email             String
+  phone             String
+  eventAddress      String
+  days              Int
+  neededAt          DateTime
+  eventDescription  String?
+  liabilityAccepted Boolean       @default(false)
+  status            InquiryStatus @default(NEU)
+  createdAt         DateTime      @default(now())
+}
+
+model AnfrageSettings {
+  id        String   @id @default("singleton")
+  introText String   @default("Hallo zusammen,\n\nich möchte meine Lautsprecher gerne im Freundes- und Bekanntenkreis ausleihen. Sie sollen nicht ungenutzt im Keller stehen bleiben. Wenn ihr also eine Location habt und sie verwenden möchtet, schickt mir einfach eine Anfrage. Ich melde mich dann bei euch.\n\nLiebe Grüße")
+  updatedAt DateTime @updatedAt
+}
+
+model SiteContent {
+  key       String   @id
+  title     String
+  body      String
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id          String  @id @default(cuid())
+  title       String
+  description String
+  linkLabel   String?
+  linkUrl     String?
+  icon        String?
+  order       Int     @default(0)
+  published   Boolean @default(true)
+}
+
+model FaqItem {
+  id       String @id @default(cuid())
+  category String
+  question String
+  answer   String
+  order    Int    @default(0)
+}
+
+enum GroupTag {
+  PRIVATE_VERANSTALTUNG
+  PRIVATES_ROLLENSPIEL
+  ZUSAMMEN_QUATSCHEN
+  SONSTIGES
+}
+
+model Group {
+  id           String             @id @default(cuid())
+  name         String
+  slug         String             @unique
+  description  String
+  coverImage   String?
+  tag          GroupTag           @default(SONSTIGES)
+  locked       Boolean            @default(false)
+  public       Boolean            @default(false)
+  ownerId      String
+  owner        User               @relation("GroupOwner", fields: [ownerId], references: [id])
+  createdAt    DateTime           @default(now())
+  members      GroupMembership[]
+  joinRequests GroupJoinRequest[]
+  posts        GroupPost[]
+  events       Event[]
+  polls        GroupPoll[]
+}
+
+model GroupPoll {
+  id        String            @id @default(cuid())
+  groupId   String
+  question  String
+  createdAt DateTime          @default(now())
+  group     Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  options   GroupPollOption[]
+}
+
+model GroupPollOption {
+  id     String          @id @default(cuid())
+  pollId String
+  label  String
+  order  Int             @default(0)
+  poll   GroupPoll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes  GroupPollVote[]
+}
+
+model GroupPollVote {
+  id        String          @id @default(cuid())
+  pollId    String
+  optionId  String
+  userId    String
+  createdAt DateTime        @default(now())
+  option    GroupPollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, userId])
+}
+
+enum GroupMemberRole {
+  MEMBER
+  MODERATOR
+}
+
+model GroupMembership {
+  id       String          @id @default(cuid())
+  userId   String
+  groupId  String
+  role     GroupMemberRole @default(MEMBER)
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group    Group           @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  joinedAt DateTime        @default(now())
+
+  @@unique([userId, groupId])
+}
+
+enum JoinRequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+model GroupJoinRequest {
+  id        String            @id @default(cuid())
+  groupId   String
+  userId    String
+  status    JoinRequestStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  group     Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+}
+
+model GroupPost {
+  id        String           @id @default(cuid())
+  groupId   String
+  authorId  String
+  content   String
+  createdAt DateTime         @default(now())
+  group     Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  author    User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  replies   GroupPostReply[]
+}
+
+model GroupPostReply {
+  id        String    @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String
+  createdAt DateTime  @default(now())
+  post      GroupPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}

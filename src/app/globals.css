@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0710;
+  --surface: #150f1f;
+  --surface-hover: #201731;
+  --foreground: #f5f3f7;
+  --muted-foreground: #ab9fc2;
+  --border: #2a2038;
+  --accent: #f97316;
+  --accent-strong: #fb923c;
+  --accent-foreground: #1a0f00;
+  --gradient-red: #ef4444;
+  --gradient-orange: #f97316;
+  --gradient-blue: #38bdf8;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-gradient-red: var(--gradient-red);
+  --color-gradient-orange: var(--gradient-orange);
+  --color-gradient-blue: var(--gradient-blue);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, var(--gradient-red), var(--gradient-orange), var(--gradient-blue));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.bg-glow {
+  background-image:
+    radial-gradient(50% 40% at 15% 15%, color-mix(in srgb, var(--gradient-red) 55%, transparent), transparent 70%),
+    radial-gradient(45% 45% at 85% 20%, color-mix(in srgb, var(--gradient-orange) 55%, transparent), transparent 70%),
+    radial-gradient(55% 45% at 50% 95%, color-mix(in srgb, var(--gradient-blue) 45%, transparent), transparent 70%);
+  animation: glow-drift 16s ease-in-out infinite;
+  background-size: 140% 140%;
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes glow-drift {
+  0%,
+  100% {
+    background-position:
+      15% 15%,
+      85% 20%,
+      50% 95%;
+  }
+  50% {
+    background-position:
+      25% 25%,
+      75% 30%,
+      45% 85%;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes logo-sway {
+  0%,
+  100% {
+    transform: rotate(-9deg) scale(1);
+  }
+  50% {
+    transform: rotate(9deg) scale(1.04);
+  }
+}
+
+.animate-logo-sway {
+  transform-origin: 50% 85%;
+  animation: logo-sway 2.6s ease-in-out infinite;
+}
+
+.rich-content p {
+  margin-bottom: 0.75em;
+  line-height: 1.7;
+}
+
+.rich-content p:last-child {
+  margin-bottom: 0;
+}
+
+.rich-content img {
+  border-radius: 0.75rem;
+  margin: 1em 0;
+  max-width: 100%;
+}
+
+.rich-content hr {
+  margin: 1.5em 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+.rich-content strong {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.rich-content em {
+  font-style: italic;
+}
