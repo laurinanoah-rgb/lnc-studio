@@ -1,12 +1,24 @@
 import { ImageUploadField } from "@/components/manager/image-upload-field";
 import { RichTextEditor } from "@/components/manager/rich-text-editor";
+import { toDateTimeLocal } from "@/lib/format";
+
+export type ExistingGroupEvent = {
+  title: string;
+  description: string;
+  location: string | null;
+  startDate: Date;
+  capacity: number | null;
+  coverImage: string | null;
+};
 
 export function GroupEventForm({
   action,
   defaultPublic,
+  existingEvent,
 }: {
   action: (formData: FormData) => void;
   defaultPublic: boolean;
+  existingEvent?: ExistingGroupEvent | null;
 }) {
   return (
     <form action={action} className="flex flex-col gap-5">
@@ -19,6 +31,7 @@ export function GroupEventForm({
           name="title"
           required
           placeholder="z. B. Halloween Karneval bei uns"
+          defaultValue={existingEvent?.title}
           className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-accent"
         />
       </div>
@@ -26,7 +39,7 @@ export function GroupEventForm({
       <div>
         <label className="text-sm text-muted-foreground">Beschreibung</label>
         <div className="mt-1">
-          <RichTextEditor name="description" />
+          <RichTextEditor name="description" defaultValue={existingEvent?.description} />
         </div>
       </div>
 
@@ -39,6 +52,7 @@ export function GroupEventForm({
             id="event-location"
             name="location"
             placeholder="Straße, Ort…"
+            defaultValue={existingEvent?.location ?? ""}
             className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-accent"
           />
         </div>
@@ -51,6 +65,7 @@ export function GroupEventForm({
             name="startDate"
             type="datetime-local"
             required
+            defaultValue={existingEvent ? toDateTimeLocal(existingEvent.startDate) : undefined}
             className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-accent"
           />
         </div>
@@ -64,11 +79,16 @@ export function GroupEventForm({
             type="number"
             min={1}
             placeholder="optional"
+            defaultValue={existingEvent?.capacity ?? undefined}
             className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-accent"
           />
         </div>
         <div>
-          <ImageUploadField name="coverImage" label="Titelbild" />
+          <ImageUploadField
+            name="coverImage"
+            label="Titelbild"
+            defaultValue={existingEvent?.coverImage}
+          />
         </div>
       </div>
 
@@ -90,7 +110,7 @@ export function GroupEventForm({
         type="submit"
         className="self-start rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-strong"
       >
-        Veranstaltung erstellen
+        {existingEvent ? "Veranstaltung aktualisieren" : "Veranstaltung erstellen"}
       </button>
     </form>
   );

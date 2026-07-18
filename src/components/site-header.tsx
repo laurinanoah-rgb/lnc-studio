@@ -44,7 +44,7 @@ export async function SiteHeader() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <Link
-            href={session?.user ? (isStaff ? "/manager" : "/gruppen") : "/login"}
+            href={session?.user ? (isStaff ? "/manager" : "/profil") : "/login"}
             className="whitespace-nowrap rounded-full border border-border px-4 py-2 text-sm transition-colors hover:bg-surface-hover"
           >
             {session?.user ? (isStaff ? "⚙️ Manager" : "👤 Mein Bereich") : "🔑 Login"}

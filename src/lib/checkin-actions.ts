@@ -28,6 +28,10 @@ export async function toggleCheckIn(rsvpId: string, slug: string, checked: boole
     data: { checkedInAt: checked ? new Date() : null },
   });
 
+  if (checked && !rsvp.checkedInAt) {
+    await prisma.user.update({ where: { id: rsvp.userId }, data: { xp: { increment: 25 } } });
+  }
+
   revalidatePath(`/veranstaltungen/${slug}/checkin`);
   revalidatePath(`/checkin/${rsvp.checkInCode}`);
 }
@@ -51,10 +55,16 @@ export async function checkInByCode(code: string) {
     throw new Error("Keine Berechtigung zum Einchecken.");
   }
 
+  const alreadyCheckedIn = !!rsvp.checkedInAt;
+
   await prisma.eventRsvp.update({
     where: { id: rsvp.id },
     data: { checkedInAt: new Date() },
   });
+
+  if (!alreadyCheckedIn) {
+    await prisma.user.update({ where: { id: rsvp.userId }, data: { xp: { increment: 25 } } });
+  }
 
   revalidatePath(`/checkin/${code}`);
   revalidatePath(`/veranstaltungen/${rsvp.event.slug}/checkin`);

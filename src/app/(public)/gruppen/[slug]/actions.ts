@@ -133,6 +133,7 @@ export async function createGroupPost(groupId: string, slug: string, formData: F
   if (!content) return;
 
   await prisma.groupPost.create({ data: { groupId, authorId: user.id, content } });
+  await prisma.user.update({ where: { id: user.id }, data: { xp: { increment: 3 } } });
   revalidatePath(`/gruppen/${slug}`);
 }
 
@@ -165,21 +166,36 @@ export async function createGroupEvent(groupId: string, slug: string, formData: 
     throw new Error("Titel, Beschreibung und Beginn sind erforderlich.");
   }
 
-  const eventSlug = await uniqueEventSlug(title);
+  const existingEvent = await prisma.event.findFirst({ where: { groupId } });
 
-  await prisma.event.create({
-    data: {
-      title,
-      slug: eventSlug,
-      description: sanitizeRichText(description),
-      location: location || null,
-      startDate: new Date(startDateRaw),
-      coverImage: coverImage || null,
-      capacity: capacityRaw ? Number(capacityRaw) : null,
-      published: true,
-      groupId,
-    },
-  });
+  if (existingEvent) {
+    await prisma.event.update({
+      where: { id: existingEvent.id },
+      data: {
+        title,
+        description: sanitizeRichText(description),
+        location: location || null,
+        startDate: new Date(startDateRaw),
+        coverImage: coverImage || null,
+        capacity: capacityRaw ? Number(capacityRaw) : null,
+      },
+    });
+  } else {
+    const eventSlug = await uniqueEventSlug(title);
+    await prisma.event.create({
+      data: {
+        title,
+        slug: eventSlug,
+        description: sanitizeRichText(description),
+        location: location || null,
+        startDate: new Date(startDateRaw),
+        coverImage: coverImage || null,
+        capacity: capacityRaw ? Number(capacityRaw) : null,
+        published: true,
+        groupId,
+      },
+    });
+  }
 
   await prisma.group.update({ where: { id: groupId }, data: { public: isPublic } });
 
@@ -238,11 +254,19 @@ export async function voteOnPoll(
 ) {
   const user = await requireMember(groupId);
 
+  const existingVote = await prisma.groupPollVote.findUnique({
+    where: { pollId_userId: { pollId, userId: user.id } },
+  });
+
   await prisma.groupPollVote.upsert({
     where: { pollId_userId: { pollId, userId: user.id } },
     update: { optionId },
     create: { pollId, optionId, userId: user.id },
   });
+
+  if (!existingVote) {
+    await prisma.user.update({ where: { id: user.id }, data: { xp: { increment: 5 } } });
+  }
 
   revalidatePath(`/gruppen/${slug}`);
 }

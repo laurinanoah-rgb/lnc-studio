@@ -12,11 +12,22 @@ export async function setRsvp(eventId: string, slug: string, status: RsvpStatus)
     redirect(`/login?callbackUrl=${encodeURIComponent(`/veranstaltungen/${slug}`)}`);
   }
 
+  const existingRsvp = await prisma.eventRsvp.findUnique({
+    where: { eventId_userId: { eventId, userId: session.user.id } },
+  });
+
   await prisma.eventRsvp.upsert({
     where: { eventId_userId: { eventId, userId: session.user.id } },
     update: { status },
     create: { eventId, userId: session.user.id, status },
   });
+
+  if (status === "ZUSAGE" && !existingRsvp) {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { xp: { increment: 10 } },
+    });
+  }
 
   revalidatePath(`/veranstaltungen/${slug}`);
 }

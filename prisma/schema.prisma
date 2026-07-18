@@ -23,6 +23,12 @@ model User {
   email         String            @unique
   passwordHash  String
   role          Role              @default(MITGLIED)
+  avatarUrl     String?
+  discordHandle String?
+  instagramUrl  String?
+  tiktokUrl     String?
+  youtubeUrl    String?
+  xp            Int               @default(0)
   createdAt     DateTime          @default(now())
   posts         Post[]
   groupMemberships GroupMembership[]

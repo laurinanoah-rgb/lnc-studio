@@ -59,7 +59,7 @@ export function MobileNav({
               Anfrage stellen
             </Link>
             <Link
-              href={isLoggedIn ? (isStaff ? "/manager" : "/gruppen") : "/login"}
+              href={isLoggedIn ? (isStaff ? "/manager" : "/profil") : "/login"}
               onClick={() => setOpen(false)}
               className="rounded-lg px-3 py-3 text-base text-muted-foreground hover:bg-surface-hover"
             >

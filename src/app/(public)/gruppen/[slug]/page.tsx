@@ -96,6 +96,10 @@ export default async function GroupDetailPage({
   const canCreateEvent = isOwner && group.tag === "PRIVATE_VERANSTALTUNG";
   const canCreatePoll = isOwner;
 
+  const pinnedEvent = canCreateEvent
+    ? await prisma.event.findFirst({ where: { groupId: group.id } })
+    : null;
+
   return (
     <Container className="max-w-3xl py-16">
       <Link href="/gruppen" className="text-sm text-muted-foreground hover:text-foreground">
@@ -131,12 +135,13 @@ export default async function GroupDetailPage({
                 <ModalTrigger
                   label="Veranstaltung"
                   icon="🎉"
-                  title="Veranstaltung erstellen"
+                  title={pinnedEvent ? "Veranstaltung bearbeiten" : "Veranstaltung erstellen"}
                   variant="primary"
                 >
                   <GroupEventForm
                     action={createGroupEvent.bind(null, group.id, group.slug)}
                     defaultPublic={group.public}
+                    existingEvent={pinnedEvent}
                   />
                 </ModalTrigger>
               )}
