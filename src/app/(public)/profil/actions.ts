@@ -18,10 +18,6 @@ export async function updateProfile(formData: FormData) {
   const user = await requireUser();
   const name = String(formData.get("name") ?? "").trim();
   const avatarUrl = String(formData.get("avatarUrl") ?? "").trim();
-  const discordHandle = String(formData.get("discordHandle") ?? "").trim();
-  const instagramUrl = String(formData.get("instagramUrl") ?? "").trim();
-  const tiktokUrl = String(formData.get("tiktokUrl") ?? "").trim();
-  const youtubeUrl = String(formData.get("youtubeUrl") ?? "").trim();
 
   if (!name) {
     throw new Error("Name ist erforderlich.");
@@ -29,17 +25,37 @@ export async function updateProfile(formData: FormData) {
 
   await prisma.user.update({
     where: { id: user.id },
-    data: {
-      name,
-      avatarUrl: avatarUrl || null,
-      discordHandle: discordHandle || null,
-      instagramUrl: instagramUrl || null,
-      tiktokUrl: tiktokUrl || null,
-      youtubeUrl: youtubeUrl || null,
-    },
+    data: { name, avatarUrl: avatarUrl || null },
   });
 
   revalidatePath("/profil");
+  revalidatePath("/profil/personalisierung");
+  revalidatePath("/mitglieder");
+}
+
+const SOCIAL_FIELDS = ["discordHandle", "instagramUrl", "tiktokUrl", "youtubeUrl"] as const;
+export type SocialField = (typeof SOCIAL_FIELDS)[number];
+
+export async function updateSocialLink(field: SocialField, formData: FormData) {
+  const user = await requireUser();
+  if (!SOCIAL_FIELDS.includes(field)) throw new Error("Unbekanntes Feld.");
+
+  const value = String(formData.get("value") ?? "").trim();
+  if (!value) throw new Error("Bitte einen Wert eingeben.");
+
+  await prisma.user.update({ where: { id: user.id }, data: { [field]: value } });
+
+  revalidatePath("/profil/personalisierung");
+  revalidatePath("/mitglieder");
+}
+
+export async function disconnectSocialLink(field: SocialField) {
+  const user = await requireUser();
+  if (!SOCIAL_FIELDS.includes(field)) throw new Error("Unbekanntes Feld.");
+
+  await prisma.user.update({ where: { id: user.id }, data: { [field]: null } });
+
+  revalidatePath("/profil/personalisierung");
   revalidatePath("/mitglieder");
 }
 
