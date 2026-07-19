@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Container } from "@/components/ui/container";
+import { Reveal } from "@/components/reveal";
 import { FaqAccordion } from "./faq-accordion";
 
 export const metadata: Metadata = { title: "FAQ" };
@@ -19,7 +20,9 @@ export default async function FaqPage() {
         {items.length === 0 ? (
           <p className="text-muted-foreground">Noch keine Fragen hinterlegt.</p>
         ) : (
-          <FaqAccordion items={items} />
+          <Reveal>
+            <FaqAccordion items={items} />
+          </Reveal>
         )}
       </div>
     </Container>

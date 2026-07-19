@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
+import { Reveal } from "@/components/reveal";
 import { formatDate } from "@/lib/format";
 import { getLevel } from "@/lib/leveling";
 import { UserBadge } from "@/components/user-badge";
@@ -39,8 +40,9 @@ export default async function MitgliederPage() {
       </p>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {members.map((member) => (
-          <Card key={member.id} className="flex items-center gap-4">
+        {members.map((member, index) => (
+          <Reveal key={member.id} delay={(index % 6) * 0.05}>
+          <Card className="flex items-center gap-4">
             {member.avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -102,6 +104,7 @@ export default async function MitgliederPage() {
               )}
             </div>
           </Card>
+          </Reveal>
         ))}
         {members.length === 0 && (
           <p className="text-muted-foreground">Noch keine Mitglieder registriert.</p>

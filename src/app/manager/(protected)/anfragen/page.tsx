@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { DeleteButton } from "@/components/manager/delete-button";
-import { updateInquiryStatus, deleteInquiry, updateAnfrageSettings } from "./actions";
-import { StatusSelect } from "./status-select";
+import { NewRibbon } from "@/components/manager/new-ribbon";
+import { approveInquiry, rejectInquiry, deleteInquiry, updateAnfrageSettings } from "./actions";
+import { StatusDecision } from "./status-decision";
+import { InquiryDetail } from "./inquiry-detail";
 import { formatDate, formatDateTime, formatTime } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Anfragen" };
@@ -45,11 +47,15 @@ export default async function ManagerInquiriesPage() {
 
       <div className="mt-8 flex flex-col gap-4">
         {inquiries.map((inquiry) => (
-          <Card key={inquiry.id}>
-            <div className="flex flex-wrap items-start justify-between gap-4">
+          <Card key={inquiry.id} className="relative overflow-hidden">
+            {inquiry.status === "NEU" && <NewRibbon />}
+            <div className="flex flex-wrap items-start justify-between gap-4 pr-8">
               <div className="min-w-0">
                 <p className="font-medium">
                   {inquiry.firstName} {inquiry.lastName}
+                  {inquiry.organization && (
+                    <span className="font-normal text-muted-foreground"> · {inquiry.organization}</span>
+                  )}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {inquiry.email} · {inquiry.phone}
@@ -57,9 +63,11 @@ export default async function ManagerInquiriesPage() {
                 <p className="mt-1 text-xs text-accent">{inquiry.eventAddress}</p>
               </div>
               <div className="flex items-center gap-3">
-                <form action={updateInquiryStatus.bind(null, inquiry.id)}>
-                  <StatusSelect defaultValue={inquiry.status} />
-                </form>
+                <StatusDecision
+                  status={inquiry.status}
+                  onApprove={approveInquiry.bind(null, inquiry.id)}
+                  onReject={rejectInquiry.bind(null, inquiry.id)}
+                />
                 <DeleteButton action={deleteInquiry.bind(null, inquiry.id)} />
               </div>
             </div>
@@ -73,10 +81,36 @@ export default async function ManagerInquiriesPage() {
                 {inquiry.eventDescription}
               </p>
             )}
+            {Array.isArray(inquiry.equipmentRequest) && inquiry.equipmentRequest.length > 0 && (
+              <div className="mt-3 text-sm text-foreground/90">
+                <p className="text-xs text-muted-foreground">Gewünschte Ausstattung:</p>
+                <ul className="mt-1 list-disc pl-5">
+                  {(
+                    inquiry.equipmentRequest as {
+                      itemId: string;
+                      name: string;
+                      quantity: number;
+                      condition?: string | null;
+                    }[]
+                  ).map((entry) => (
+                    <li key={entry.itemId}>
+                      {entry.name} × {entry.quantity}
+                      {entry.condition && (
+                        <span className="text-muted-foreground"> ({entry.condition})</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <p className="mt-3 text-xs text-muted-foreground">
-              Haftung akzeptiert: {inquiry.liabilityAccepted ? "Ja" : "Nein"} · Eingegangen am{" "}
+              Haftung akzeptiert: {inquiry.liabilityAccepted ? "Ja" : "Nein"} · Datenschutz
+              akzeptiert: {inquiry.privacyAccepted ? "Ja" : "Nein"} · Eingegangen am{" "}
               {formatDateTime(inquiry.createdAt)}
             </p>
+            <div className="mt-3 flex justify-end">
+              <InquiryDetail inquiry={inquiry} />
+            </div>
           </Card>
         ))}
         {inquiries.length === 0 && (

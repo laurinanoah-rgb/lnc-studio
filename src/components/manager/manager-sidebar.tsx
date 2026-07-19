@@ -6,12 +6,15 @@ import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types/next-auth";
 import { LogoBadge } from "@/components/logo-badge";
 
+const profileLink = { href: "/profil", label: "👤 Mein Profil" };
+
 const links = [
   { href: "/manager", label: "Dashboard", exact: true },
   { href: "/manager/updates", label: "Updates" },
   { href: "/manager/veranstaltungen", label: "Veranstaltungen" },
   { href: "/manager/galerie", label: "Galerie" },
   { href: "/manager/anfragen", label: "Anfragen" },
+  { href: "/manager/ausstattung", label: "Ausstattung" },
   { href: "/manager/projekte", label: "Projekte" },
   { href: "/manager/gruppen", label: "Gruppen" },
   { href: "/manager/faq", label: "FAQ" },
@@ -35,6 +38,13 @@ export function ManagerSidebar({ role }: { role: UserRole }) {
         <p className="mt-1 text-xs text-muted-foreground">Manager-Bereich</p>
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-4">
+        <Link
+          href={profileLink.href}
+          className="mb-2 rounded-lg border border-border px-3 py-2 text-sm text-foreground transition-colors hover:bg-surface-hover"
+        >
+          {profileLink.label}
+        </Link>
+        <div className="mb-1 border-t border-border" />
         {allLinks.map((link) => {
           const active = link.exact ? pathname === link.href : pathname.startsWith(link.href);
           return (

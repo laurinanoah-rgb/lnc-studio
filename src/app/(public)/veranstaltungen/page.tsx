@@ -86,15 +86,15 @@ function EventCard({
   return (
     <Card className={muted ? "opacity-70" : undefined}>
       {event.coverImage && (
-        <div className="relative -mx-6 -mt-6 mb-4">
+        <Link href={`/veranstaltungen/${event.slug}`} className="relative -mx-6 -mt-6 mb-4 block">
           {!muted && <EventCountdownBadge startDate={event.startDate} />}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={event.coverImage}
             alt=""
-            className="aspect-video w-full rounded-t-2xl object-cover"
+            className="aspect-video w-full rounded-t-2xl object-cover transition-opacity hover:opacity-90"
           />
-        </div>
+        </Link>
       )}
       {event.group && (
         <Link
@@ -105,7 +105,11 @@ function EventCard({
         </Link>
       )}
       <p className="text-xs text-accent">{formatDateTime(event.startDate)}</p>
-      <h3 className="mt-2 text-lg font-semibold">{event.title}</h3>
+      <h3 className="mt-2 text-lg font-semibold">
+        <Link href={`/veranstaltungen/${event.slug}`} className="hover:text-accent">
+          {event.title}
+        </Link>
+      </h3>
       {event.location && (
         <a
           href={googleMapsDirectionsUrl(event.location)}

@@ -5,12 +5,15 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types/next-auth";
 
+const profileLink = { href: "/profil", label: "👤 Mein Profil" };
+
 const links = [
   { href: "/manager", label: "Dashboard", exact: true },
   { href: "/manager/updates", label: "Updates" },
   { href: "/manager/veranstaltungen", label: "Veranstaltungen" },
   { href: "/manager/galerie", label: "Galerie" },
   { href: "/manager/anfragen", label: "Anfragen" },
+  { href: "/manager/ausstattung", label: "Ausstattung" },
   { href: "/manager/projekte", label: "Projekte" },
   { href: "/manager/gruppen", label: "Gruppen" },
   { href: "/manager/faq", label: "FAQ" },
@@ -26,6 +29,12 @@ export function ManagerMobileNav({ role }: { role: UserRole }) {
 
   return (
     <nav className="flex gap-2 overflow-x-auto border-b border-border bg-surface px-4 py-3 md:hidden">
+      <Link
+        href={profileLink.href}
+        className="shrink-0 rounded-full border border-border px-4 py-1.5 text-sm text-foreground transition-colors hover:bg-surface-hover"
+      >
+        {profileLink.label}
+      </Link>
       {allLinks.map((link) => {
         const active = link.exact ? pathname === link.href : pathname.startsWith(link.href);
         return (

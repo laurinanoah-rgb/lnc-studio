@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
+import { Reveal } from "@/components/reveal";
 import { LinkButton } from "@/components/ui/button";
 import { joinGroup, requestToJoin } from "./actions";
 import { groupTagLabels } from "@/lib/group-tags";
@@ -54,12 +55,13 @@ export default async function GruppenPage() {
         <p className="mt-12 text-muted-foreground">Noch keine Gruppen vorhanden.</p>
       ) : (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {groups.map((group) => {
+          {groups.map((group, index) => {
             const isMember = group.members.length > 0;
             const hasPendingRequest = group.joinRequests.length > 0;
 
             return (
-              <Card key={group.id}>
+              <Reveal key={group.id} delay={(index % 6) * 0.05}>
+              <Card>
                 {group.coverImage && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -119,6 +121,7 @@ export default async function GruppenPage() {
                   )}
                 </div>
               </Card>
+              </Reveal>
             );
           })}
         </div>

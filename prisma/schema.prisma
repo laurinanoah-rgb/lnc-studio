@@ -124,23 +124,44 @@ model GalleryImage {
 
 enum InquiryStatus {
   NEU
-  BEARBEITUNG
-  ERLEDIGT
+  GENEHMIGT
+  ABGELEHNT
 }
 
 model InquiryRequest {
-  id                String        @id @default(cuid())
-  firstName         String
-  lastName          String
-  email             String
-  phone             String
-  eventAddress      String
-  days              Int
-  neededAt          DateTime
-  eventDescription  String?
-  liabilityAccepted Boolean       @default(false)
-  status            InquiryStatus @default(NEU)
-  createdAt         DateTime      @default(now())
+  id                  String        @id @default(cuid())
+  firstName           String
+  lastName            String
+  organization        String?
+  email               String
+  phone               String
+  eventAddress        String
+  days                Int
+  neededAt            DateTime
+  eventDescription    String?
+  equipmentRequest    Json?
+  includedAccessories Json?
+  liabilityAccepted   Boolean       @default(false)
+  privacyAccepted     Boolean       @default(false)
+  status              InquiryStatus @default(NEU)
+  createdAt           DateTime      @default(now())
+}
+
+model EquipmentItem {
+  id        String   @id @default(cuid())
+  name      String
+  imageUrl  String?
+  condition String?
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model IncludedAccessory {
+  id        String  @id @default(cuid())
+  name      String
+  order     Int     @default(0)
+  published Boolean @default(true)
 }
 
 model AnfrageSettings {

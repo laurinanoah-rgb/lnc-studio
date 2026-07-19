@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
+import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = { title: "Projekte" };
 
@@ -22,26 +23,28 @@ export default async function ProjektePage() {
         <p className="mt-12 text-muted-foreground">Aktuell keine Projekte hinterlegt.</p>
       ) : (
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
-          {projects.map((project) => (
-            <Card key={project.id}>
-              <div className="flex items-start gap-4">
-                {project.icon && <span className="text-3xl">{project.icon}</span>}
-                <div>
-                  <h2 className="text-lg font-semibold">{project.title}</h2>
-                  <p className="mt-2 text-sm text-muted-foreground">{project.description}</p>
-                  {project.linkUrl && (
-                    <a
-                      href={project.linkUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-4 inline-block rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-strong"
-                    >
-                      {project.linkLabel || "Mehr erfahren"}
-                    </a>
-                  )}
+          {projects.map((project, index) => (
+            <Reveal key={project.id} delay={(index % 4) * 0.06}>
+              <Card>
+                <div className="flex items-start gap-4">
+                  {project.icon && <span className="text-3xl">{project.icon}</span>}
+                  <div>
+                    <h2 className="text-lg font-semibold">{project.title}</h2>
+                    <p className="mt-2 text-sm text-muted-foreground">{project.description}</p>
+                    {project.linkUrl && (
+                      <a
+                        href={project.linkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-4 inline-block rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-strong"
+                      >
+                        {project.linkLabel || "Mehr erfahren"}
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </Reveal>
           ))}
         </div>
       )}

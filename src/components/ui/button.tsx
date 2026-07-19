@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 type ButtonVariant = "primary" | "outline" | "ghost" | "gradient";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-transform hover:scale-[1.02] disabled:opacity-50 disabled:pointer-events-none disabled:hover:scale-100";
+  "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:pointer-events-none disabled:hover:scale-100";
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary: "bg-accent text-accent-foreground hover:bg-accent-strong",
