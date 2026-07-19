@@ -1,32 +1,26 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
+let resend: Resend | null = null;
 
-function getTransporter() {
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+function getClient() {
+  if (!process.env.RESEND_API_KEY) {
     return null;
   }
-  if (!transporter) {
-    transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
-      },
-    });
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY);
   }
-  return transporter;
+  return resend;
 }
 
 export async function sendMail({ to, subject, html }: { to: string; subject: string; html: string }) {
-  const client = getTransporter();
+  const client = getClient();
   if (!client) {
-    console.warn(`[mail] GMAIL_USER/GMAIL_APP_PASSWORD nicht gesetzt – E-Mail an ${to} nicht gesendet.`);
+    console.warn(`[mail] RESEND_API_KEY nicht gesetzt – E-Mail an ${to} nicht gesendet.`);
     return;
   }
 
-  await client.sendMail({
-    from: `LNC Community <${process.env.GMAIL_USER}>`,
+  await client.emails.send({
+    from: process.env.RESEND_FROM_EMAIL || "LNC Community <onboarding@resend.dev>",
     to,
     subject,
     html,
