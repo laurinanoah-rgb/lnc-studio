@@ -71,10 +71,10 @@ export default async function GroupDetailPage({
         where: { groupId: group.id },
         orderBy: { createdAt: "desc" },
         include: {
-          author: { select: { name: true } },
+          author: { select: { name: true, xp: true } },
           replies: {
             orderBy: { createdAt: "asc" },
-            include: { author: { select: { name: true } } },
+            include: { author: { select: { name: true, xp: true } } },
           },
         },
       })

@@ -7,6 +7,7 @@ import { auth } from "@/auth";
 import type { GroupTag } from "@prisma/client";
 import { slugify } from "@/lib/slugify";
 import { sanitizeRichText } from "@/lib/sanitize";
+import { awardXp } from "@/lib/xp";
 
 async function requireOwner(groupId: string) {
   const session = await auth();
@@ -133,7 +134,7 @@ export async function createGroupPost(groupId: string, slug: string, formData: F
   if (!content) return;
 
   await prisma.groupPost.create({ data: { groupId, authorId: user.id, content } });
-  await prisma.user.update({ where: { id: user.id }, data: { xp: { increment: 3 } } });
+  await awardXp(user.id, 3);
   revalidatePath(`/gruppen/${slug}`);
 }
 
@@ -265,7 +266,7 @@ export async function voteOnPoll(
   });
 
   if (!existingVote) {
-    await prisma.user.update({ where: { id: user.id }, data: { xp: { increment: 5 } } });
+    await awardXp(user.id, 5);
   }
 
   revalidatePath(`/gruppen/${slug}`);

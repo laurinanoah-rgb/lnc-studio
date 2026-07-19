@@ -18,6 +18,21 @@
   --danger: #ef4444;
 }
 
+[data-neon="true"] {
+  --background: #030007;
+  --surface: #0d0221;
+  --surface-hover: #1c0a3d;
+  --foreground: #f0f9ff;
+  --muted-foreground: #a78bfa;
+  --border: #3d1a5c;
+  --accent: #ff2fd4;
+  --accent-strong: #ff6ec7;
+  --accent-foreground: #1a001a;
+  --gradient-red: #ff2fd4;
+  --gradient-orange: #39ff14;
+  --gradient-blue: #00f0ff;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -56,6 +71,11 @@ body {
   background-clip: text;
   color: transparent;
   animation: gradient-shift 8s ease infinite;
+}
+
+.text-glow {
+  color: var(--gradient-blue);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--gradient-blue) 70%, transparent);
 }
 
 .bg-glow {

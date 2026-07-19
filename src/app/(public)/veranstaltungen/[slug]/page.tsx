@@ -15,6 +15,7 @@ import { formatDateTime } from "@/lib/format";
 import { googleMapsDirectionsUrl } from "@/lib/maps";
 import { canViewEvent, canManageEvent } from "@/lib/event-access";
 import { generateQrDataUrl } from "@/lib/qrcode";
+import { UserBadge } from "@/components/user-badge";
 
 async function getBaseUrl() {
   const headersList = await headers();
@@ -46,11 +47,11 @@ export default async function EventDetailPage({
     include: {
       rsvps: {
         where: { status: "ZUSAGE" },
-        include: { user: { select: { id: true, name: true } } },
+        include: { user: { select: { id: true, name: true, xp: true } } },
       },
       comments: {
         orderBy: { createdAt: "asc" },
-        include: { author: { select: { name: true } } },
+        include: { author: { select: { name: true, xp: true } } },
       },
     },
   });
@@ -190,7 +191,7 @@ export default async function EventDetailPage({
                     key={rsvp.id}
                     className="rounded-full bg-surface-hover px-3 py-1 text-xs text-foreground"
                   >
-                    {rsvp.user.name}
+                    <UserBadge name={rsvp.user.name} xp={rsvp.user.xp} />
                   </span>
                 ))}
               </div>

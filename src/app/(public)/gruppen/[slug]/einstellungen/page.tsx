@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { ImageUploadField } from "@/components/manager/image-upload-field";
 import { groupTagOptions } from "@/lib/group-tags";
 import { formatDate } from "@/lib/format";
+import { UserBadge } from "@/components/user-badge";
 import {
   updateGroupSettings,
   approveJoinRequest,
@@ -40,7 +41,7 @@ export default async function GroupSettingsPage({
     prisma.groupMembership.findMany({
       where: { groupId: group.id },
       orderBy: { joinedAt: "asc" },
-      include: { user: { select: { id: true, name: true } } },
+      include: { user: { select: { id: true, name: true, xp: true } } },
     }),
   ]);
 
@@ -183,7 +184,9 @@ export default async function GroupSettingsPage({
                 className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border px-3 py-2 text-sm"
               >
                 <div>
-                  <span>{member.user.name}</span>
+                  <span>
+                    <UserBadge name={member.user.name} xp={member.user.xp} />
+                  </span>
                   <span className="ml-2 text-xs text-muted-foreground">
                     seit {formatDate(member.joinedAt)}
                   </span>

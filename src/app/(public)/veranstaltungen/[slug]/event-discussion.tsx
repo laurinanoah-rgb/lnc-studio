@@ -4,13 +4,14 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDateTime } from "@/lib/format";
 import { postEventComment, deleteEventComment } from "./actions";
+import { UserBadge } from "@/components/user-badge";
 
 type CommentData = {
   id: string;
   content: string;
   createdAt: Date;
   authorId: string;
-  author: { name: string };
+  author: { name: string; xp: number };
 };
 
 export function EventDiscussion({
@@ -79,7 +80,9 @@ export function EventDiscussion({
                     className="border-t border-border pt-3 first:border-t-0 first:pt-0"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-xs font-medium">{comment.author.name}</p>
+                      <p className="text-xs font-medium">
+                        <UserBadge name={comment.author.name} xp={comment.author.xp} />
+                      </p>
                       {(comment.authorId === currentUserId || isStaff) && (
                         <form action={deleteEventComment.bind(null, comment.id, slug)}>
                           <button

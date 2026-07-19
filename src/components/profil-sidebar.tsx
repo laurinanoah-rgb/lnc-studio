@@ -10,7 +10,15 @@ const links = [
   { href: "/profil/sicherheit", label: "🔒 Sicherheit" },
 ];
 
-export function ProfilSidebar() {
+function NeuBadge() {
+  return (
+    <span className="animate-pulse-ring ml-auto rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold text-accent-foreground">
+      NEU
+    </span>
+  );
+}
+
+export function ProfilSidebar({ showNeuBadge = false }: { showNeuBadge?: boolean }) {
   const pathname = usePathname();
 
   return (
@@ -23,13 +31,14 @@ export function ProfilSidebar() {
               key={link.href}
               href={link.href}
               className={cn(
-                "rounded-lg px-3 py-2 text-sm transition-colors",
+                "flex items-center rounded-lg px-3 py-2 text-sm transition-colors",
                 active
                   ? "bg-accent text-accent-foreground"
                   : "text-muted-foreground hover:bg-surface-hover hover:text-foreground",
               )}
             >
               {link.label}
+              {showNeuBadge && link.href === "/profil/personalisierung" && <NeuBadge />}
             </Link>
           );
         })}
@@ -38,7 +47,7 @@ export function ProfilSidebar() {
   );
 }
 
-export function ProfilMobileNav() {
+export function ProfilMobileNav({ showNeuBadge = false }: { showNeuBadge?: boolean }) {
   const pathname = usePathname();
 
   return (
@@ -50,13 +59,14 @@ export function ProfilMobileNav() {
             key={link.href}
             href={link.href}
             className={cn(
-              "shrink-0 rounded-full border px-4 py-1.5 text-sm transition-colors",
+              "flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm transition-colors",
               active
                 ? "border-accent bg-accent text-accent-foreground"
                 : "border-border text-muted-foreground hover:text-foreground",
             )}
           >
             {link.label}
+            {showNeuBadge && link.href === "/profil/personalisierung" && <NeuBadge />}
           </Link>
         );
       })}

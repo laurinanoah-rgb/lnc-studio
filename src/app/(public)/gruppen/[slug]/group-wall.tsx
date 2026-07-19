@@ -3,19 +3,20 @@
 import { useState } from "react";
 import { formatDateTime } from "@/lib/format";
 import { createGroupPost, replyToGroupPost } from "./actions";
+import { UserBadge } from "@/components/user-badge";
 
 type ReplyData = {
   id: string;
   content: string;
   createdAt: Date;
-  author: { name: string };
+  author: { name: string; xp: number };
 };
 
 type PostData = {
   id: string;
   content: string;
   createdAt: Date;
-  author: { name: string };
+  author: { name: string; xp: number };
   replies: ReplyData[];
 };
 
@@ -56,7 +57,9 @@ export function GroupWall({
 
           return (
             <div key={post.id} className="rounded-xl border border-border bg-surface p-4">
-              <p className="text-sm font-medium">{post.author.name}</p>
+              <p className="text-sm font-medium">
+                <UserBadge name={post.author.name} xp={post.author.xp} />
+              </p>
               <p className="text-xs text-muted-foreground">{formatDateTime(post.createdAt)}</p>
               <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/90">{post.content}</p>
 
@@ -64,7 +67,9 @@ export function GroupWall({
                 <div className="mt-3 flex flex-col gap-3 border-l border-border pl-4">
                   {post.replies.map((reply) => (
                     <div key={reply.id}>
-                      <p className="text-xs font-medium">{reply.author.name}</p>
+                      <p className="text-xs font-medium">
+                        <UserBadge name={reply.author.name} xp={reply.author.xp} />
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {formatDateTime(reply.createdAt)}
                       </p>

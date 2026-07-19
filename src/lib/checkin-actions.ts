@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { canManageEvent } from "@/lib/event-access";
+import { awardXp } from "@/lib/xp";
 
 export async function toggleCheckIn(rsvpId: string, slug: string, checked: boolean) {
   const session = await auth();
@@ -29,7 +30,7 @@ export async function toggleCheckIn(rsvpId: string, slug: string, checked: boole
   });
 
   if (checked && !rsvp.checkedInAt) {
-    await prisma.user.update({ where: { id: rsvp.userId }, data: { xp: { increment: 25 } } });
+    await awardXp(rsvp.userId, 500);
   }
 
   revalidatePath(`/veranstaltungen/${slug}/checkin`);
@@ -63,7 +64,7 @@ export async function checkInByCode(code: string) {
   });
 
   if (!alreadyCheckedIn) {
-    await prisma.user.update({ where: { id: rsvp.userId }, data: { xp: { increment: 25 } } });
+    await awardXp(rsvp.userId, 500);
   }
 
   revalidatePath(`/checkin/${code}`);

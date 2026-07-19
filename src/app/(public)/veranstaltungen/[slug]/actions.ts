@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { awardXp } from "@/lib/xp";
 import type { RsvpStatus } from "@prisma/client";
 
 export async function setRsvp(eventId: string, slug: string, status: RsvpStatus) {
@@ -23,10 +24,7 @@ export async function setRsvp(eventId: string, slug: string, status: RsvpStatus)
   });
 
   if (status === "ZUSAGE" && !existingRsvp) {
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { xp: { increment: 10 } },
-    });
+    await awardXp(session.user.id, 10);
   }
 
   revalidatePath(`/veranstaltungen/${slug}`);

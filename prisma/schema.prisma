@@ -24,11 +24,19 @@ model User {
   passwordHash  String
   role          Role              @default(MITGLIED)
   avatarUrl     String?
+  bio           String?
   discordHandle String?
   instagramUrl  String?
   tiktokUrl     String?
   youtubeUrl    String?
   xp            Int               @default(0)
+  profileBonusClaimed Boolean     @default(false)
+  lastClaimAt   DateTime?
+  loginStreak   Int               @default(0)
+  specialBadges String[]          @default([])
+  neonModeEnabled Boolean         @default(false)
+  pendingLevelUp Json?
+  level10UnlockedAt DateTime?
   createdAt     DateTime          @default(now())
   posts         Post[]
   groupMemberships GroupMembership[]
